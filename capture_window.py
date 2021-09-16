@@ -4,6 +4,9 @@ from tkinter import messagebox
 import ctypes
 #from ctypes import cast
 #from ctypes.wintypes import HWND, UINT, WPARAM, LPARAM
+import json
+import os
+#import io
 
 #todo: フレームを見えなくする＋ウィンドウ終了の実装方法を決める
 #⇒一旦これでOKとする・・・。
@@ -13,6 +16,19 @@ import ctypes
 #⇒できてる。でも出力フォーマットはJSONにしようと思う。
 #todo: 座標リストを指定し、キャプチャ＋クリップボード保存
 #todo: 座標アイテムをファイルに出力するモード、キャプチャするモードで振り分け
+
+
+class Rectangle():
+    x0 = 0
+    y0 = 0
+    x1 = 0
+    y1 = 0
+
+    def __init__(self,x0,y0,x1,y1):
+        self.x0 = x0
+        self.y0 = y0
+        self.x1 = x1
+        self.y1 = y1
 
 class Application(tkinter.Frame):
 
@@ -97,10 +113,26 @@ class Application(tkinter.Frame):
             self.master.destroy()
 
     def select_rectangle(self, event):
-        with open("rectangle.txt", "a", encoding='UTF-8') as f:
-            result = "x0:"+str(self.x0)+","+"y0:"+str(self.y0)+","+"x1:"+str(self.x1)+","+"y1:"+str(self.y1)
-            print(result, file=f)
-            print(result)
+        file = "rectangle.json"
+        data = []
+        if os.path.isfile(file):
+            with open(file, "r", encoding='UTF-8') as f:
+                try:
+                    data = json.load(f)
+                except Exception:
+                    print("No Json Format File. overwritte now.")
+            f.close()
+            print(json.dumps(data))
+        with open(file, "w", encoding='UTF-8') as f:
+            item ={'x0':self.x0,'y0':self.y0,'x1':self.x1,'y1':self.y1}
+            #if os.path.isfile(file):
+            #    motodata = f.read()
+            #    data = json.loads(motodata)
+            data.append(item)
+            json.dump(data, f)
+            #result = "x0:"+str(self.x0)+","+"y0:"+str(self.y0)+","+"x1:"+str(self.x1)+","+"y1:"+str(self.y1)
+            #print(result, file=f)
+            print(json.dumps(item))
         f.close()
 
 root = tkinter.Tk()
